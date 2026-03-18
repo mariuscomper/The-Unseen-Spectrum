@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Unseen Spectrum — A Global Perspective on Color Vision Deficiency</title>
+<meta name="description" content="Interactive data exploration of color vision deficiency prevalence, impact, and lived experiences worldwide.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf8f4;--bg2:#f0ede6;--bg3:#e8e4db;
+  --fg:#1a1a18;--fg2:#4a4a45;--fg3:#7a7a72;
+  --accent:#c23616;--accent2:#2d6a4f;--accent3:#1d3557;
+  --gold:#d4a017;--serif:'DM Serif Display',Georgia,serif;
+  --sans:'IBM Plex Sans','Helvetica Neue',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --max:1120px;--gap:clamp(1rem,4vw,3rem);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111110;--bg2:#1a1a18;--bg3:#252522;
+    --fg:#e8e4db;--fg2:#b0ada4;--fg3:#7a7a72;
+    --accent:#e84c30;--accent2:#52b788;--accent3:#6ea8d8;
+  }
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;overflow-x:hidden}
+::selection{background:var(--accent);color:#fff}
+a{color:var(--accent3);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s}
+a:hover{border-bottom-color:var(--accent3)}
+
+.container{max-width:var(--max);margin:0 auto;padding:0 var(--gap)}
+
+/* ── HERO ── */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;padding:2rem var(--gap)}
+.hero::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse 60% 50% at 20% 40%,rgba(194,54,22,.08),transparent),
+  radial-gradient(ellipse 40% 60% at 80% 60%,rgba(45,106,79,.06),transparent);
+  pointer-events:none}
+.hero-kicker{font-family:var(--mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;opacity:0;transform:translateY(20px);animation:fadeUp .8s .3s forwards}
+.hero h1{font-family:var(--serif);font-size:clamp(2.8rem,7vw,5.5rem);line-height:1.05;max-width:14ch;margin-bottom:1.5rem;opacity:0;transform:translateY(30px);animation:fadeUp .8s .5s forwards}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-sub{font-size:clamp(1rem,2vw,1.25rem);color:var(--fg2);max-width:52ch;line-height:1.6;font-weight:300;opacity:0;transform:translateY(20px);animation:fadeUp .8s .7s forwards}
+.hero-stats{display:flex;gap:2rem;margin-top:3rem;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .9s forwards}
+.hero-stat{text-align:left}
+.hero-stat strong{display:block;font-family:var(--serif);font-size:clamp(2rem,4vw,3rem);color:var(--accent)}
+.hero-stat span{font-size:.8rem;color:var(--fg3);text-transform:uppercase;letter-spacing:.08em}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.scroll-hint span{font-size:.7rem;color:var(--fg3);letter-spacing:.1em;text-transform:uppercase}
+.scroll-hint .arrow{width:20px;height:20px;border-right:2px solid var(--fg3);border-bottom:2px solid var(--fg3);transform:rotate(45deg);animation:bounce 2s infinite}
+
+/* ── SECTIONS ── */
+section{padding:clamp(3rem,8vw,6rem) 0}
+.section-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.section-title{font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin-bottom:1rem;max-width:20ch}
+.section-intro{font-size:1.05rem;color:var(--fg2);max-width:60ch;line-height:1.7;font-weight:300;margin-bottom:2.5rem}
+
+/* ── PREVALENCE CHART ── */
+.prev-grid{display:grid;grid-template-columns:1fr;gap:2rem}
+@media(min-width:768px){.prev-grid{grid-template-columns:1fr 1fr}}
+.chart-wrap{background:var(--bg2);border-radius:12px;padding:1.5rem;position:relative}
+.chart-wrap h3{font-family:var(--sans);font-size:.85rem;font-weight:600;margin-bottom:1rem;color:var(--fg2)}
+.bar-chart{display:flex;flex-direction:column;gap:6px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{width:120px;font-size:.75rem;color:var(--fg2);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--bg3);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.25,.46,.45,.94);width:0}
+.bar-fill.m{background:var(--accent3)}
+.bar-fill.f{background:var(--accent2)}
+.bar-val{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;font-weight:600;color:#fff;mix-blend-mode:difference}
+
+/* ── CVD TYPES ── */
+.types-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+.type-card{background:var(--bg2);border-radius:12px;padding:1.5rem;border-left:4px solid var(--fg3);transition:transform .3s,box-shadow .3s}
+.type-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.type-card[data-type="protan"]{border-left-color:var(--accent)}
+.type-card[data-type="deutan"]{border-left-color:var(--accent2)}
+.type-card[data-type="tritan"]{border-left-color:var(--accent3)}
+.type-card[data-type="mono"]{border-left-color:var(--fg3)}
+.type-card h4{font-family:var(--serif);font-size:1.2rem;margin-bottom:.25rem}
+.type-card .type-sub{font-size:.75rem;color:var(--fg3);font-family:var(--mono);margin-bottom:.75rem}
+.type-card p{font-size:.85rem;color:var(--fg2);line-height:1.6}
+.type-card .type-prev{font-size:1.5rem;font-weight:600;margin-top:.75rem;font-family:var(--serif)}
+
+/* ── SIMULATOR ── */
+.sim-section{background:var(--bg2);border-radius:16px;padding:clamp(1.5rem,4vw,3rem);margin-top:2rem}
+.sim-controls{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.sim-btn{font-family:var(--sans);font-size:.8rem;font-weight:500;padding:.5rem 1rem;border:1.5px solid var(--bg3);border-radius:8px;background:transparent;color:var(--fg2);cursor:pointer;transition:all .2s}
+.sim-btn.active,.sim-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(194,54,22,.06)}
+.sim-canvas-wrap{position:relative;border-radius:12px;overflow:hidden}
+.sim-canvas-wrap canvas{display:block;width:100%;border-radius:12px}
+.sim-label{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;padding:.3rem .6rem;border-radius:6px;font-family:var(--mono);backdrop-filter:blur(8px)}
+
+/* ── IMPACT ── */
+.impact-meter{margin-bottom:1.25rem}
+.impact-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.35rem}
+.impact-name{font-size:.85rem;font-weight:500}
+.impact-level{font-size:.7rem;font-family:var(--mono);color:var(--fg3)}
+.impact-track{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.impact-bar{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.25,.46,.45,.94);width:0}
+
+/* ── AWARENESS ── */
+.aware-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.aware-card{background:var(--bg2);border-radius:12px;padding:1.5rem;text-align:center;transition:transform .3s}
+.aware-card:hover{transform:scale(1.03)}
+.aware-num{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);color:var(--accent);line-height:1}
+.aware-desc{font-size:.8rem;color:var(--fg2);margin-top:.5rem;line-height:1.5}
+
+/* ── OCCUPATION ── */
+.occ-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.occ-table th{text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--fg3);padding:.75rem .5rem;border-bottom:2px solid var(--bg3)}
+.occ-table td{padding:.75rem .5rem;border-bottom:1px solid var(--bg3);vertical-align:middle}
+.occ-table tr:hover td{background:var(--bg2)}
+.occ-badge{display:inline-block;font-size:.65rem;font-weight:600;padding:.2rem .5rem;border-radius:4px;text-transform:uppercase;letter-spacing:.05em}
+.occ-badge.strict{background:rgba(194,54,22,.12);color:var(--accent)}
+.occ-badge.moderate{background:rgba(212,160,23,.12);color:var(--gold)}
+.occ-badge.variable{background:rgba(45,106,79,.12);color:var(--accent2)}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:2rem;margin-top:2rem}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--bg3)}
+.tl-item{position:relative;margin-bottom:2rem;padding-left:1.5rem}
+.tl-item::before{content:'';position:absolute;left:-2rem;top:.5rem;width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid var(--bg);z-index:1}
+.tl-item h4{font-family:var(--serif);font-size:1.1rem;margin-bottom:.25rem}
+.tl-item p{font-size:.85rem;color:var(--fg2);line-height:1.6}
+
+/* ── QUOTE ── */
+.pull-quote{border-left:4px solid var(--accent);padding:1.5rem 2rem;margin:2rem 0;background:var(--bg2);border-radius:0 12px 12px 0}
+.pull-quote p{font-family:var(--serif);font-size:1.15rem;font-style:italic;line-height:1.6;color:var(--fg)}
+.pull-quote cite{display:block;margin-top:.75rem;font-family:var(--mono);font-size:.7rem;font-style:normal;color:var(--fg3)}
+
+/* ── RECS ── */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.rec-card{background:var(--bg2);border-radius:12px;padding:1.5rem;border-top:3px solid var(--accent2)}
+.rec-card h4{font-size:.95rem;font-weight:600;margin-bottom:.75rem}
+.rec-card ul{list-style:none;padding:0}
+.rec-card li{font-size:.8rem;color:var(--fg2);padding:.4rem 0;padding-left:1.2rem;position:relative;line-height:1.5}
+.rec-card li::before{content:'';position:absolute;left:0;top:.65rem;width:6px;height:6px;border-radius:50%;background:var(--accent2)}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--bg3);padding:3rem 0;margin-top:2rem}
+footer p{font-size:.75rem;color:var(--fg3);line-height:1.6}
+footer a{color:var(--accent3)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:rotate(45deg) translateY(0)}40%{transform:rotate(45deg) translateY(-6px)}60%{transform:rotate(45deg) translateY(-3px)}}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s cubic-bezier(.25,.46,.45,.94)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
+
+/* ── NAV ── */
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:.75rem var(--gap);display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);background:rgba(250,248,244,.8);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+@media(prefers-color-scheme:dark){.top-nav{background:rgba(17,17,16,.8)}}
+.top-nav.scrolled{border-bottom-color:var(--bg3)}
+.nav-logo{font-family:var(--serif);font-size:1rem;color:var(--fg)}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{font-size:.75rem;color:var(--fg3);text-transform:uppercase;letter-spacing:.08em;border:none;transition:color .2s}
+.nav-links a:hover{color:var(--accent);border:none}
+@media(max-width:640px){.nav-links{display:none}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .bar-label{width:80px;font-size:.65rem}
+  .hero-stats{gap:1.25rem}
+  .type-card .type-prev{font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav" id="nav">
+  <div class="nav-logo">The Unseen Spectrum</div>
+  <div class="nav-links">
+    <a href="#prevalence">Prevalence</a>
+    <a href="#types">Types</a>
+    <a href="#simulator">Simulator</a>
+    <a href="#impact">Impact</a>
+    <a href="#action">Action</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero container">
+  <div class="hero-kicker">Data-driven exploration</div>
+  <h1>The <em>Unseen</em> Spectrum</h1>
+  <p class="hero-sub">350 million people worldwide experience color vision deficiency. Most don't know it until something goes wrong. An interactive exploration of the data behind the invisible condition.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>8%</strong><span>of males affected</span></div>
+    <div class="hero-stat"><strong>0.5%</strong><span>of females affected</span></div>
+    <div class="hero-stat"><strong>80%</strong><span>undiagnosed at school</span></div>
+  </div>
+  <div class="scroll-hint"><span>Scroll to explore</span><div class="arrow"></div></div>
+</header>
+
+<!-- ═══ PREVALENCE ═══ -->
+<section id="prevalence">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">01 — Epidemiology</div>
+      <h2 class="section-title">Not evenly distributed</h2>
+      <p class="section-intro">CVD prevalence varies dramatically across populations — from less than 1% in Fijian males to over 10% among Druze Arabs. The disparity reveals a complex interplay of genetics, geography, and possibly evolutionary selection.</p>
+    </div>
+    <div class="prev-grid">
+      <div class="chart-wrap reveal reveal-d1">
+        <h3>Male prevalence by population (%)</h3>
+        <div class="bar-chart" id="maleChart"></div>
+      </div>
+      <div class="chart-wrap reveal reveal-d2">
+        <h3>Female prevalence where reported (%)</h3>
+        <div class="bar-chart" id="femaleChart"></div>
+        <p style="font-size:.75rem;color:var(--fg3);margin-top:1rem;line-height:1.5">Female CVD is far rarer due to X-linked recessive inheritance — two defective copies are needed. Many studies report no female cases, marked "N/A" above.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TYPES ═══ -->
+<section id="types" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">02 — Classification</div>
+      <h2 class="section-title">Four ways to see differently</h2>
+      <p class="section-intro">Color vision deficiency is not a single condition. It spans a spectrum from mild anomaly to total color absence, each affecting different cone photoreceptors in the retina.</p>
+    </div>
+    <div class="types-grid">
+      <div class="type-card reveal reveal-d1" data-type="deutan">
+        <h4>Deuteranopia / Deuteranomaly</h4>
+        <div class="type-sub">M-cone (green) absent or weak</div>
+        <p>The most common form. Green appears more red, and red-green distinctions collapse. Affects up to 6% of males.</p>
+        <div class="type-prev" style="color:var(--accent2)">~75%</div>
+        <div style="font-size:.7rem;color:var(--fg3)">of all CVD cases</div>
+      </div>
+      <div class="type-card reveal reveal-d2" data-type="protan">
+        <h4>Protanopia / Protanomaly</h4>
+        <div class="type-sub">L-cone (red) absent or weak</div>
+        <p>Reds appear darker and shift toward brown or black. Creates dangerous situations with brake lights and warning signals.</p>
+        <div class="type-prev" style="color:var(--accent)">~1%</div>
+        <div style="font-size:.7rem;color:var(--fg3)">of males affected</div>
+      </div>
+      <div class="type-card reveal reveal-d3" data-type="tritan">
+        <h4>Tritanopia / Tritanomaly</h4>
+        <div class="type-sub">S-cone (blue) absent or weak</div>
+        <p>Blue-green and yellow-violet confusions. Rare, autosomal dominant — affects both sexes equally.</p>
+        <div class="type-prev" style="color:var(--accent3)">&lt;0.01%</div>
+        <div style="font-size:.7rem;color:var(--fg3)">of the population</div>
+      </div>
+      <div class="type-card reveal reveal-d4" data-type="mono">
+        <h4>Achromatopsia</h4>
+        <div class="type-sub">All cones absent or non-functional</div>
+        <p>Complete colour blindness — the world in greyscale. Accompanied by light sensitivity, nystagmus, and severely reduced acuity.</p>
+        <div class="type-prev" style="color:var(--fg3)">Very rare</div>
+        <div style="font-size:.7rem;color:var(--fg3)">~1 in 30,000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SIMULATOR ═══ -->
+<section id="simulator">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">03 — Perception</div>
+      <h2 class="section-title">What do they actually see?</h2>
+      <p class="section-intro">These simulations approximate how a colour-rich scene appears to individuals with different types of CVD. The transforms are based on established colour-science matrices.</p>
+    </div>
+    <div class="sim-section reveal">
+      <div class="sim-controls">
+        <button class="sim-btn active" data-mode="normal">Normal vision</button>
+        <button class="sim-btn" data-mode="protanopia">Protanopia</button>
+        <button class="sim-btn" data-mode="deuteranopia">Deuteranopia</button>
+        <button class="sim-btn" data-mode="tritanopia">Tritanopia</button>
+        <button class="sim-btn" data-mode="achromatopsia">Achromatopsia</button>
+      </div>
+      <div class="sim-canvas-wrap">
+        <canvas id="simCanvas" width="800" height="400"></canvas>
+        <div class="sim-label" id="simLabel">Normal vision</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ IMPACT ═══ -->
+<section id="impact" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">04 — Lived experience</div>
+      <h2 class="section-title">The real-world cost of not seeing colour</h2>
+      <p class="section-intro">CVD is far more than a clinical curiosity. It shapes education, limits careers, and erodes confidence — especially when it remains undiagnosed.</p>
+    </div>
+
+    <div class="pull-quote reveal">
+      <p>"I always felt anxious during art class because I could never be sure if I was using the right colors. It made me want to avoid those activities altogether."</p>
+      <cite>— Study participant, Chakrabarti (2018)</cite>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr;gap:3rem;margin-top:2.5rem" id="impactSection">
+      <div class="reveal">
+        <h3 style="font-family:var(--serif);font-size:1.3rem;margin-bottom:1.25rem">Educational & psychosocial impact</h3>
+        <div id="impactMeters"></div>
+      </div>
+      <div class="reveal reveal-d1">
+        <h3 style="font-family:var(--serif);font-size:1.3rem;margin-bottom:1.25rem">The awareness gap</h3>
+        <div class="aware-grid">
+          <div class="aware-card">
+            <div class="aware-num">80.8%</div>
+            <div class="aware-desc">of CVD students in Nigeria were unaware of their condition before screening</div>
+          </div>
+          <div class="aware-card">
+            <div class="aware-num">34%</div>
+            <div class="aware-desc">of Australians with CVD say their career was directly affected</div>
+          </div>
+          <div class="aware-card">
+            <div class="aware-num">24%</div>
+            <div class="aware-desc">were explicitly barred from a profession they wanted to pursue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote reveal" style="margin-top:2.5rem;border-left-color:var(--accent3)">
+      <p>"I wanted to be a pilot, but when I failed the color vision test, I felt like a door had closed before I even had a chance to try."</p>
+      <cite>— Study participant, Chakrabarti (2018)</cite>
+    </div>
+
+    <div class="reveal" style="margin-top:2.5rem">
+      <h3 style="font-family:var(--serif);font-size:1.3rem;margin-bottom:1.25rem">Occupational restrictions</h3>
+      <div style="overflow-x:auto">
+        <table class="occ-table">
+          <thead><tr><th>Profession</th><th>Colour vision requirement</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Aviation (pilots)</strong></td><td><span class="occ-badge strict">Strict</span></td><td style="font-size:.8rem;color:var(--fg2)">Universal exclusion. UK CAA introduced CAD test allowing some CVD pilots.</td></tr>
+            <tr><td><strong>Railway / transport</strong></td><td><span class="occ-badge strict">Strict</span></td><td style="font-size:.8rem;color:var(--fg2)">Signal recognition critical. Most jurisdictions enforce testing.</td></tr>
+            <tr><td><strong>Electrical work</strong></td><td><span class="occ-badge moderate">Moderate–strict</span></td><td style="font-size:.8rem;color:var(--fg2)">Wire colour codes essential for safety. Varies by employer.</td></tr>
+            <tr><td><strong>Healthcare</strong></td><td><span class="occ-badge variable">Variable</span></td><td style="font-size:.8rem;color:var(--fg2)">Some specialties (pathology, dermatology) require it; others don't.</td></tr>
+            <tr><td><strong>Armed forces</strong></td><td><span class="occ-badge strict">Strict</span></td><td style="font-size:.8rem;color:var(--fg2)">Camouflage detection, signal identification. Often disqualifying.</td></tr>
+            <tr><td><strong>Graphic design</strong></td><td><span class="occ-badge variable">Variable</span></td><td style="font-size:.8rem;color:var(--fg2)">Not formally restricted but practically challenging without tools.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DIAGNOSIS TIMELINE ═══ -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">05 — Diagnosis pathway</div>
+      <h2 class="section-title">A diagnosis that comes too late</h2>
+      <p class="section-intro">Most individuals with CVD are diagnosed only after years of unexplained difficulties. Testing is reliable from age 4–6, yet routine screening remains absent in most school systems worldwide.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <h4>Ages 3–5</h4>
+        <p>Unusual colour choices in drawings. Parents may notice but often attribute it to creativity or preference.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Ages 6–10</h4>
+        <p>Struggles with colour-coded materials in school. May be mislabelled as inattentive or underperforming. Testing is reliable but rarely conducted.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Ages 11–16</h4>
+        <p>Repeated confusion in science labs, geography maps, and art class. Peer awareness grows — teasing and embarrassment may increase.</p>
+      </div>
+      <div class="tl-item">
+        <h4>Ages 17+</h4>
+        <p>Discovery often comes through occupational screening, a driving test, or an incidental eye exam. By now, career paths may already be narrowed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RECOMMENDATIONS ═══ -->
+<section id="action" style="background:var(--bg2)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">06 — What can be done</div>
+      <h2 class="section-title">Recommendations from the evidence</h2>
+      <p class="section-intro">Early detection, inclusive design, and systemic awareness can dramatically improve outcomes for people with CVD. These are the key interventions supported by the research.</p>
+    </div>
+    <div class="rec-grid">
+      <div class="rec-card reveal reveal-d1">
+        <h4>For educators</h4>
+        <ul>
+          <li>Implement colour vision screening in the first school year</li>
+          <li>Use patterns, textures, and labels — never colour alone</li>
+          <li>Provide alternative assignments for colour-dependent tasks</li>
+          <li>Train teachers to recognise early signs of CVD</li>
+          <li>Guide students toward suitable career paths</li>
+        </ul>
+      </div>
+      <div class="rec-card reveal reveal-d2">
+        <h4>For clinicians</h4>
+        <ul>
+          <li>Include colour vision in standard paediatric eye exams</li>
+          <li>Document CVD status in medical records</li>
+          <li>Educate families about implications and coping strategies</li>
+          <li>Recommend digital screening tools (e.g., Colourspot)</li>
+          <li>Refer for genetic counselling when appropriate</li>
+        </ul>
+      </div>
+      <div class="rec-card reveal reveal-d3">
+        <h4>For employers</h4>
+        <ul>
+          <li>Screen for colour vision in safety-critical roles</li>
+          <li>Provide alternative labelling and shape-coded signals</li>
+          <li>Offer assistive technologies (colour-ID apps, filters)</li>
+          <li>Foster inclusive culture — raise awareness, reduce stigma</li>
+          <li>Use competency-based assessments over blanket exclusions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="container">
+    <p><strong>The Unseen Spectrum</strong> — An interactive data exploration based on the review paper <em>"A Global Perspective of Color Vision Deficiency: Awareness, Diagnosis, and Lived Experiences"</em> by Ali Almustanyir, published in <em>Healthcare</em> (2025). DOI: <a href="https://doi.org/10.3390/healthcare13162031" target="_blank" rel="noopener">10.3390/healthcare13162031</a></p>
+    <p style="margin-top:.5rem">Built for educational purposes. Data visualisations are approximations based on published findings. Colour simulation matrices follow established colour-science models (Brettel et al., Viénot et al.).</p>
+  </div>
+</footer>
+
+<script>
+// ── Scroll reveal ──
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── Nav scroll ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// ── Prevalence bars ──
+const maleData=[
+  {label:'Druze Arabs',val:10},{label:'Russians',val:9.2},{label:'Norwegians',val:9},
+  {label:'European Caucasians',val:8},{label:'N. Europe / USA',val:8},{label:'India (AP)',val:7.5},
+  {label:'Chinese (high)',val:6.9},{label:'Ireland',val:4.7},{label:'Nigeria (Imo)',val:4.7},
+  {label:'Japanese',val:4},{label:'South Africa',val:2.2},{label:'Aboriginal Aus.',val:1.9},
+  {label:'India (Hyderabad)',val:1.33},{label:'Fijians',val:0.8}
+];
+const femaleData=[
+  {label:'Nigeria (Imo)',val:1.1},{label:'N. Europe / USA',val:0.5},
+  {label:'European Caucasians',val:0.4},{label:'India (Hyderabad)',val:0.25},
+  {label:'Ireland',val:0,na:true},{label:'South Africa',val:0,na:true},
+  {label:'Aboriginal Aus.',val:0,na:true},{label:'Japanese',val:0,na:true},
+  {label:'Chinese',val:0,na:true},{label:'Fijians',val:0,na:true}
+];
+function buildBars(data,containerId,cls,maxVal){
+  const c=document.getElementById(containerId);
+  data.forEach(d=>{
+    const pct=(d.val/maxVal*100);
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<div class="bar-label">${d.label}</div><div class="bar-track"><div class="bar-fill ${cls}" data-w="${d.na?0:pct}"></div>${d.na?'<span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--fg3)">N/A</span>':d.val>0?`<span class="bar-val">${d.val}%</span>`:''}</div>`;
+    c.appendChild(row);
+  });
+}
+buildBars(maleData,'maleChart','m',11);
+buildBars(femaleData,'femaleChart','f',1.5);
+
+const barObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    e.target.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.w+'%'});
+    barObs.unobserve(e.target);
+  }})
+},{threshold:0.2});
+document.querySelectorAll('.chart-wrap').forEach(el=>barObs.observe(el));
+
+// ── Impact meters ──
+const impacts=[
+  {name:'Colour-coded school assignments',pct:95,color:'var(--accent)',label:'High'},
+  {name:'Science & art subjects',pct:90,color:'var(--accent)',label:'High'},
+  {name:'Reading coloured graphs & maps',pct:75,color:'var(--gold)',label:'Moderate–high'},
+  {name:'Traffic signal recognition',pct:60,color:'var(--gold)',label:'Moderate'},
+  {name:'Social & peer interactions',pct:55,color:'var(--accent3)',label:'Variable'},
+  {name:'Self-esteem & confidence',pct:50,color:'var(--accent3)',label:'Variable'}
+];
+const im=document.getElementById('impactMeters');
+impacts.forEach(d=>{
+  const m=document.createElement('div');m.className='impact-meter';
+  m.innerHTML=`<div class="impact-header"><span class="impact-name">${d.name}</span><span class="impact-level">${d.label}</span></div><div class="impact-track"><div class="impact-bar" data-w="${d.pct}" style="background:${d.color}"></div></div>`;
+  im.appendChild(m);
+});
+const impObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    e.target.querySelectorAll('.impact-bar').forEach(b=>{b.style.width=b.dataset.w+'%'});
+    impObs.unobserve(e.target);
+  }})
+},{threshold:0.2});
+impObs.observe(im);
+
+// ── CVD Simulator ──
+(function(){
+  const canvas=document.getElementById('simCanvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const W=canvas.width,H=canvas.height;
+
+  // Draw a rich test scene
+  function drawScene(){
+    // Sky gradient
+    const sky=ctx.createLinearGradient(0,0,0,H*0.55);
+    sky.addColorStop(0,'#1d3557');sky.addColorStop(1,'#a8dadc');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,W,H*0.55);
+    // Sun
+    ctx.beginPath();ctx.arc(W*0.8,H*0.18,40,0,Math.PI*2);ctx.fillStyle='#f1c40f';ctx.fill();
+    // Grass
+    const grass=ctx.createLinearGradient(0,H*0.55,0,H);
+    grass.addColorStop(0,'#27ae60');grass.addColorStop(1,'#1e8449');
+    ctx.fillStyle=grass;ctx.fillRect(0,H*0.55,W,H*0.45);
+    // Tree trunk
+    ctx.fillStyle='#6d4c2a';ctx.fillRect(140,H*0.3,24,H*0.27);
+    // Foliage
+    ctx.beginPath();ctx.arc(152,H*0.25,55,0,Math.PI*2);ctx.fillStyle='#2ecc71';ctx.fill();
+    ctx.beginPath();ctx.arc(120,H*0.3,40,0,Math.PI*2);ctx.fillStyle='#28b463';ctx.fill();
+    ctx.beginPath();ctx.arc(184,H*0.3,40,0,Math.PI*2);ctx.fillStyle='#1abc9c';ctx.fill();
+    // Flowers
+    [[80,H*0.7,'#e74c3c'],[110,H*0.72,'#f39c12'],[300,H*0.68,'#e74c3c'],[340,H*0.75,'#9b59b6'],[500,H*0.7,'#f1c40f'],[550,H*0.72,'#e74c3c'],[620,H*0.68,'#3498db'],[680,H*0.74,'#e67e22']].forEach(([x,y,c])=>{
+      ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='#f9e79f';ctx.fill();
+    });
+    // House
+    ctx.fillStyle='#c0392b';ctx.fillRect(400,H*0.35,120,H*0.2);
+    // Roof
+    ctx.beginPath();ctx.moveTo(390,H*0.35);ctx.lineTo(460,H*0.2);ctx.lineTo(530,H*0.35);ctx.closePath();ctx.fillStyle='#7f1d1d';ctx.fill();
+    // Door
+    ctx.fillStyle='#5b2c0f';ctx.fillRect(445,H*0.43,30,H*0.12);
+    // Window
+    ctx.fillStyle='#aed6f1';ctx.fillRect(410,H*0.38,25,20);ctx.fillRect(485,H*0.38,25,20);
+    // Rainbow
+    const rainbowColors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#8e44ad'];
+    rainbowColors.forEach((c,i)=>{
+      ctx.beginPath();ctx.arc(W*0.45,H*0.55,180-i*12,Math.PI,0);ctx.strokeStyle=c;ctx.lineWidth=10;ctx.stroke();
+    });
+    // Traffic light
+    ctx.fillStyle='#2c3e50';ctx.fillRect(620,H*0.25,30,70);ctx.fillRect(630,H*0.55,10,H*0.2);
+    [[635,H*0.3,'#e74c3c'],[635,H*0.3+20,'#f1c40f'],[635,H*0.3+40,'#27ae60']].forEach(([x,y,c])=>{
+      ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();
+    });
+    // Colour swatches bar at bottom
+    const swatches=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#8e44ad','#1abc9c','#e84393','#6c5ce7','#d63031'];
+    const sw=W/swatches.length;
+    swatches.forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(i*sw,H-30,sw,30)});
+  }
+
+  drawScene();
+  const originalData=ctx.getImageData(0,0,W,H);
+
+  // CVD simulation matrices (linear RGB)
+  const matrices={
+    normal:[1,0,0,0,1,0,0,0,1],
+    protanopia:[0.567,0.433,0,0.558,0.442,0,0,0.242,0.758],
+    deuteranopia:[0.625,0.375,0,0.7,0.3,0,0,0.3,0.7],
+    tritanopia:[0.95,0.05,0,0,0.433,0.567,0,0.475,0.525],
+    achromatopsia:[0.299,0.587,0.114,0.299,0.587,0.114,0.299,0.587,0.114]
+  };
+
+  const labels={normal:'Normal vision',protanopia:'Protanopia — no red cones',deuteranopia:'Deuteranopia — no green cones',tritanopia:'Tritanopia — no blue cones',achromatopsia:'Achromatopsia — no cone function'};
+
+  function applyMatrix(mode){
+    const m=matrices[mode];
+    const src=new Uint8ClampedArray(originalData.data);
+    const imgData=ctx.createImageData(W,H);
+    const d=imgData.data;
+    for(let i=0;i<src.length;i+=4){
+      const r=src[i]/255,g=src[i+1]/255,b=src[i+2]/255;
+      // sRGB -> linear
+      const rl=r<=0.04045?r/12.92:Math.pow((r+0.055)/1.055,2.4);
+      const gl=g<=0.04045?g/12.92:Math.pow((g+0.055)/1.055,2.4);
+      const bl=b<=0.04045?b/12.92:Math.pow((b+0.055)/1.055,2.4);
+      // Transform
+      let ro=m[0]*rl+m[1]*gl+m[2]*bl;
+      let go=m[3]*rl+m[4]*gl+m[5]*bl;
+      let bo=m[6]*rl+m[7]*gl+m[8]*bl;
+      // Linear -> sRGB
+      ro=ro<=0.0031308?12.92*ro:1.055*Math.pow(ro,1/2.4)-0.055;
+      go=go<=0.0031308?12.92*go:1.055*Math.pow(go,1/2.4)-0.055;
+      bo=bo<=0.0031308?12.92*bo:1.055*Math.pow(bo,1/2.4)-0.055;
+      d[i]=Math.round(Math.max(0,Math.min(1,ro))*255);
+      d[i+1]=Math.round(Math.max(0,Math.min(1,go))*255);
+      d[i+2]=Math.round(Math.max(0,Math.min(1,bo))*255);
+      d[i+3]=src[i+3];
+    }
+    ctx.putImageData(imgData,0,0);
+    document.getElementById('simLabel').textContent=labels[mode];
+  }
+
+  document.querySelectorAll('.sim-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.sim-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      applyMatrix(btn.dataset.mode);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
